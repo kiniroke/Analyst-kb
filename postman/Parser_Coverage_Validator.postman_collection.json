@@ -1,0 +1,532 @@
+{
+  "info": {
+    "name": "Parser Coverage Validator",
+    "_postman_id": "9a9ad3c8-2a24-4eab-9c77-0dba1a96cb41",
+    "description": "Postman collection for Parser Coverage Validator.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Intern Viewer\",\n  \"email\": \"intern.viewer@csi.local\",\n  \"password\": \"Viewer12345\",\n  \"department\": \"Data Analytics Department\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@csi.local\",\n  \"password\": \"Admin12345\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sources",
+      "item": [
+        {
+          "name": "Get Sources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/sources"
+          }
+        },
+        {
+          "name": "Create Source",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"demo-source.local\",\n  \"baseUrl\": \"https://demo-source.local\",\n  \"newsListUrl\": \"https://demo-source.local/news\",\n  \"sourceType\": \"NEWS_PORTAL\",\n  \"aggregationLevel\": \"REGIONAL\",\n  \"region\": \"Almaty\",\n  \"language\": \"ru\",\n  \"watcher\": \"intern\",\n  \"status\": \"NEEDS_REVIEW\",\n  \"containerSelector\": \".news-item\",\n  \"titleSelector\": \"h2 a\",\n  \"linkSelector\": \"a\",\n  \"dateSelector\": \"time\"\n}"
+            },
+            "url": "{{baseUrl}}/api/sources"
+          }
+        },
+        {
+          "name": "Update Source",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\",\n  \"notes\": \"Selectors verified during internship demo.\"\n}"
+            },
+            "url": "{{baseUrl}}/api/sources/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Extraction",
+      "item": [
+        {
+          "name": "Run Extraction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/extraction/run/1"
+          }
+        },
+        {
+          "name": "Test Selectors",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceId\": 1,\n  \"containerSelector\": \"article, .article-item\",\n  \"titleSelector\": \"h3 a, h2 a\",\n  \"linkSelector\": \"a\",\n  \"dateSelector\": \"time, .date\"\n}"
+            },
+            "url": "{{baseUrl}}/api/extraction/test-selectors"
+          }
+        },
+        {
+          "name": "Get Extraction Runs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/extraction/runs"
+          }
+        },
+        {
+          "name": "Get Extracted Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/extraction/items/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CSI Data",
+      "item": [
+        {
+          "name": "Preview CSI Export Import",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "samples/csi_socmedia_export_sample.csv"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/csi/import/preview"
+          }
+        },
+        {
+          "name": "Confirm CSI Export Import",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "samples/csi_socmedia_export_sample.csv"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/csi/import/confirm"
+          }
+        },
+        {
+          "name": "Load CSI API Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"apiEndpoint\": \"https://example.local/api/export\",\n  \"method\": \"GET\",\n  \"token\": \"session-token-here\",\n  \"sourceName\": \"zakon.kz\",\n  \"periodFrom\": \"2026-05-01\",\n  \"periodTo\": \"2026-05-03\"\n}"
+            },
+            "url": "{{baseUrl}}/api/csi/api/load"
+          }
+        },
+        {
+          "name": "Create Manual CSI Batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"records\": [\n    {\n      \"source\": \"zakon.kz\",\n      \"title\": \"Government approves regional transport update\",\n      \"url\": \"http://zakon.kz/news/transport-update-1\",\n      \"date\": \"2026-05-02 11:00\",\n      \"author\": \"Reporter Desk\",\n      \"platform\": \"SMI\",\n      \"tone\": \"neutral\",\n      \"region\": \"National\"\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/csi/manual"
+          }
+        },
+        {
+          "name": "Get CSI Batches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/csi/batches"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Coverage",
+      "item": [
+        {
+          "name": "Run Coverage Check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceId\": 1,\n  \"extractionRunId\": 1,\n  \"csiBatchId\": 1,\n  \"periodFrom\": \"2026-05-01\",\n  \"periodTo\": \"2026-05-03\",\n  \"sourceNameFilter\": \"zakon.kz\"\n}"
+            },
+            "url": "{{baseUrl}}/api/coverage/run"
+          }
+        },
+        {
+          "name": "Get Coverage Results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/coverage/1/results"
+          }
+        },
+        {
+          "name": "Create Issues From Coverage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"selectedStatuses\": [\"MISSING_IN_CSI\", \"DUPLICATE_IN_CSI\", \"DATE_MISMATCH\"]\n}"
+            },
+            "url": "{{baseUrl}}/api/coverage/1/create-issues"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Issues And Tasks",
+      "item": [
+        {
+          "name": "Get Issues",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/issues"
+          }
+        },
+        {
+          "name": "Create Issue",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceId\": 1,\n  \"title\": \"Manual selector review required\",\n  \"issueType\": \"TITLE_SELECTOR_FAILED\",\n  \"severity\": \"MEDIUM\",\n  \"status\": \"NEW\",\n  \"evidence\": \"Anchor text is present but selectors miss article cards.\",\n  \"recommendation\": \"Adjust container and title selectors in Extraction Lab.\",\n  \"assignedToId\": 2\n}"
+            },
+            "url": "{{baseUrl}}/api/issues"
+          }
+        },
+        {
+          "name": "Create Task From Issue",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Review selector issue\",\n  \"description\": \"Validate updated selectors and rerun extraction.\",\n  \"priority\": \"HIGH\",\n  \"assignedToId\": 2\n}"
+            },
+            "url": "{{baseUrl}}/api/issues/1/create-task"
+          }
+        },
+        {
+          "name": "Get Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tasks"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Knowledge And Reports",
+      "item": [
+        {
+          "name": "Get Knowledge Articles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/knowledge"
+          }
+        },
+        {
+          "name": "Create Knowledge Article",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"How to verify source coverage after selector update\",\n  \"category\": \"COVERAGE_VALIDATION\",\n  \"summary\": \"Short checklist for rerunning coverage after source selector changes.\",\n  \"content\": \"Use Extraction Lab first, then compare fresh source output with a CSI export or API batch.\",\n  \"steps\": [\n    \"Open the source in Extraction Lab.\",\n    \"Run selector test and review evidence.\",\n    \"Save selectors only after extraction result looks stable.\",\n    \"Run a coverage check against the latest CSI batch.\"\n  ]\n}"
+            },
+            "url": "{{baseUrl}}/api/knowledge"
+          }
+        },
+        {
+          "name": "Get Parser Coverage Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reports/parser-coverage"
+          }
+        },
+        {
+          "name": "Export Coverage TXT",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reports/export/parser-coverage.txt"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/audit-logs"
+          }
+        }
+      ]
+    }
+  ]
+}

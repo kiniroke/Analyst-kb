@@ -1,0 +1,4 @@
+name,baseUrl,newsListUrl,sourceType,aggregationLevel,region,language,watcher,status,containerSelector,titleSelector,linkSelector,dateSelector
+zakon.kz,http://zakon.kz,http://zakon.kz,NEWS_PORTAL,REPUBLICAN,National,ru,aksaule,ACTIVE,"article, .article-item","h3 a, h2 a","a","time, .date"
+lada.kz,https://www.lada.kz/,https://www.lada.kz/,REGIONAL_MEDIA,REGIONAL,Mangystau,ru,guldana,NEEDS_REVIEW,".news-item",".news-item__title a","a",".news-item__date"
+inaktau.kz,https://www.inaktau.kz/,https://www.inaktau.kz/news,REGIONAL_MEDIA,REGIONAL,Mangystau,ru,zhanat,ACTIVE,".news-list-item","h2 a","a","time"

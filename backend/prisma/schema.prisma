@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int                @id @default(autoincrement())
+  fullName          String
+  email             String             @unique
+  passwordHash      String
+  role              String             @default("VIEWER")
+  department        String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  uploadedBatches   CsiDataBatch[]     @relation("BatchUploader")
+  extractionRuns    ExtractionRun[]    @relation("RunCreator")
+  coverageChecks    CoverageCheck[]    @relation("CoverageCreator")
+  createdIssues     DataIssue[]        @relation("IssueCreator")
+  assignedIssues    DataIssue[]        @relation("IssueAssignee")
+  createdTasks      Task[]             @relation("TaskCreator")
+  assignedTasks     Task[]             @relation("TaskAssignee")
+  knowledgeArticles KnowledgeArticle[]
+  auditLogs         AuditLog[]
+}
+
+model NewsSource {
+  id                   Int                 @id @default(autoincrement())
+  name                 String              @unique
+  baseUrl              String
+  newsListUrl          String?
+  normalizedUrl        String
+  sourceType           String
+  aggregationLevel     String              @default("UNKNOWN")
+  region               String?
+  language             String?
+  watcher              String?
+  status               String              @default("ACTIVE")
+  titleSelector        String?
+  linkSelector         String?
+  dateSelector         String?
+  containerSelector    String?
+  lastExtractionStatus String              @default("NOT_TESTED")
+  lastExtractedAt      DateTime?
+  notes                String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  extractionRuns       ExtractionRun[]
+  extractedNewsItems   ExtractedNewsItem[]
+  coverageChecks       CoverageCheck[]
+  issues               DataIssue[]
+}
+
+model ExtractionRun {
+  id             Int                 @id @default(autoincrement())
+  sourceId       Int
+  startedAt      DateTime
+  finishedAt     DateTime?
+  status         String              @default("NOT_TESTED")
+  pageUrl        String
+  httpStatus     Int?
+  responseTimeMs Int?
+  itemsFound     Int                 @default(0)
+  itemsWithTitle Int                 @default(0)
+  itemsWithUrl   Int                 @default(0)
+  itemsWithDate  Int                 @default(0)
+  errorMessage   String?
+  evidenceJson   String?
+  createdById    Int?
+  createdAt      DateTime            @default(now())
+  source         NewsSource          @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  createdBy      User?               @relation("RunCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  extractedItems ExtractedNewsItem[]
+  coverageChecks CoverageCheck[]
+
+  @@index([sourceId, createdAt])
+}
+
+model ExtractedNewsItem {
+  id              Int                   @id @default(autoincrement())
+  sourceId        Int
+  extractionRunId Int
+  title           String
+  url             String
+  normalizedUrl   String
+  publishedAt     DateTime?
+  rawDate         String?
+  position        Int?
+  extractedAt     DateTime
+  createdAt       DateTime              @default(now())
+  source          NewsSource            @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  extractionRun   ExtractionRun         @relation(fields: [extractionRunId], references: [id], onDelete: Cascade)
+  matchResults    CoverageMatchResult[]
+
+  @@index([sourceId, extractionRunId])
+}
+
+model CsiDataBatch {
+  id             Int             @id @default(autoincrement())
+  mode           String
+  fileName       String?
+  apiEndpoint    String?
+  periodFrom     DateTime?
+  periodTo       DateTime?
+  totalRows      Int             @default(0)
+  successfulRows Int             @default(0)
+  failedRows     Int             @default(0)
+  sourceLabel    String?
+  notes          String?
+  uploadedById   Int
+  createdAt      DateTime        @default(now())
+  uploadedBy     User            @relation("BatchUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  records        CsiRecord[]
+  coverageChecks CoverageCheck[]
+}
+
+model CsiRecord {
+  id            Int                   @id @default(autoincrement())
+  batchId       Int
+  sourceName    String?
+  title         String
+  url           String?
+  normalizedUrl String?
+  publishedAt   DateTime?
+  rawDate       String?
+  author        String?
+  platform      String?
+  tone          String?
+  region        String?
+  importedAt    DateTime
+  createdAt     DateTime              @default(now())
+  batch         CsiDataBatch          @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  matchResults  CoverageMatchResult[]
+
+  @@index([batchId, title])
+}
+
+model CoverageCheck {
+  id               Int                   @id @default(autoincrement())
+  sourceId         Int
+  extractionRunId  Int
+  csiBatchId       Int?
+  checkedAt        DateTime
+  periodFrom       DateTime?
+  periodTo         DateTime?
+  status           String
+  sourceItemsCount Int                   @default(0)
+  csiItemsCount    Int                   @default(0)
+  matchedCount     Int                   @default(0)
+  missingCount     Int                   @default(0)
+  duplicateCount   Int                   @default(0)
+  mismatchCount    Int                   @default(0)
+  coveragePercent  Float                 @default(0)
+  summary          String?
+  createdById      Int
+  createdAt        DateTime              @default(now())
+  source           NewsSource            @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  extractionRun    ExtractionRun         @relation(fields: [extractionRunId], references: [id], onDelete: Cascade)
+  csiBatch         CsiDataBatch?         @relation(fields: [csiBatchId], references: [id], onDelete: SetNull)
+  createdBy        User                  @relation("CoverageCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  matchResults     CoverageMatchResult[]
+  issues           DataIssue[]
+
+  @@index([sourceId, checkedAt])
+}
+
+model CoverageMatchResult {
+  id              Int                @id @default(autoincrement())
+  coverageCheckId Int
+  extractedNewsId Int?
+  csiRecordId     Int?
+  matchStatus     String
+  matchScore      Float              @default(0)
+  evidence        String?
+  createdAt       DateTime           @default(now())
+  coverageCheck   CoverageCheck      @relation(fields: [coverageCheckId], references: [id], onDelete: Cascade)
+  extractedNews   ExtractedNewsItem? @relation(fields: [extractedNewsId], references: [id], onDelete: SetNull)
+  csiRecord       CsiRecord?         @relation(fields: [csiRecordId], references: [id], onDelete: SetNull)
+}
+
+model DataIssue {
+  id              Int            @id @default(autoincrement())
+  sourceId        Int
+  coverageCheckId Int?
+  entityId        String?
+  title           String
+  issueType       String
+  severity        String
+  status          String         @default("NEW")
+  evidence        String?
+  recommendation  String?
+  createdById     Int
+  assignedToId    Int?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  source          NewsSource     @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  coverageCheck   CoverageCheck? @relation(fields: [coverageCheckId], references: [id], onDelete: SetNull)
+  createdBy       User           @relation("IssueCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  assignedTo      User?          @relation("IssueAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  tasks           Task[]
+
+  @@index([sourceId, issueType, status])
+}
+
+model Task {
+  id             Int        @id @default(autoincrement())
+  title          String
+  description    String?
+  status         String     @default("TODO")
+  priority       String     @default("MEDIUM")
+  dueDate        DateTime?
+  assignedToId   Int?
+  createdById    Int
+  relatedIssueId Int?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  assignedTo     User?      @relation("TaskAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdBy      User       @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  relatedIssue   DataIssue? @relation(fields: [relatedIssueId], references: [id], onDelete: SetNull)
+}
+
+model KnowledgeArticle {
+  id          Int      @id @default(autoincrement())
+  title       String
+  category    String
+  summary     String
+  content     String
+  steps       String
+  createdById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}

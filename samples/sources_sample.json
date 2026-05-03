@@ -1,0 +1,47 @@
+[
+  {
+    "name": "zakon.kz",
+    "baseUrl": "http://zakon.kz",
+    "newsListUrl": "http://zakon.kz",
+    "sourceType": "NEWS_PORTAL",
+    "aggregationLevel": "REPUBLICAN",
+    "region": "National",
+    "language": "ru",
+    "watcher": "aksaule",
+    "status": "ACTIVE",
+    "containerSelector": "article, .article-item",
+    "titleSelector": "h3 a, h2 a",
+    "linkSelector": "a",
+    "dateSelector": "time, .date"
+  },
+  {
+    "name": "lada.kz",
+    "baseUrl": "https://www.lada.kz/",
+    "newsListUrl": "https://www.lada.kz/",
+    "sourceType": "REGIONAL_MEDIA",
+    "aggregationLevel": "REGIONAL",
+    "region": "Mangystau",
+    "language": "ru",
+    "watcher": "guldana",
+    "status": "NEEDS_REVIEW",
+    "containerSelector": ".news-item",
+    "titleSelector": ".news-item__title a",
+    "linkSelector": "a",
+    "dateSelector": ".news-item__date"
+  },
+  {
+    "name": "inaktau.kz",
+    "baseUrl": "https://www.inaktau.kz/",
+    "newsListUrl": "https://www.inaktau.kz/news",
+    "sourceType": "REGIONAL_MEDIA",
+    "aggregationLevel": "REGIONAL",
+    "region": "Mangystau",
+    "language": "ru",
+    "watcher": "zhanat",
+    "status": "ACTIVE",
+    "containerSelector": ".news-list-item",
+    "titleSelector": "h2 a",
+    "linkSelector": "a",
+    "dateSelector": "time"
+  }
+]
